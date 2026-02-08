@@ -1,0 +1,95 @@
+---
+title: "What Is a Database, Really?"
+slug: "what-is-a-database-really"
+summary: "Beyond 'it stores data' — how databases actually work under the hood."
+publishedAt: "2026-01-10"
+topic: "databases"
+sourceUrl: "https://architecturenotes.co/things-you-should-know-about-databases/"
+sourcePublisher: "Architecture Notes"
+difficulty: "beginner"
+readTimeMinutes: 8
+readNext:
+  - "how-discord-stores-messages"
+order: 0
+---
+
+## Why This Matters
+
+Every application you'll ever build needs to store data somewhere. You've probably used databases in class projects — maybe PostgreSQL, maybe MongoDB, maybe SQLite. But have you ever wondered what's actually happening when you run a query?
+
+Understanding how databases work under the hood is the difference between "I know SQL" and "I can design a system that handles 10 million users."
+
+<Callout type="info">
+This post isn't about learning SQL syntax. It's about understanding the **machinery** beneath the query language — the data structures, the algorithms, the trade-offs that database engineers think about every day.
+</Callout>
+
+## The Simplest Possible Database
+
+A database, at its most fundamental, is two operations:
+
+```python
+# Store a value
+def set(key, value):
+    with open("database.txt", "a") as f:
+        f.write(f"{key},{value}\n")
+
+# Retrieve a value
+def get(key):
+    with open("database.txt", "r") as f:
+        for line in reversed(f.readlines()):
+            k, v = line.strip().split(",", 1)
+            if k == key:
+                return v
+    return None
+```
+
+This actually works! It's append-only (fast writes), and reading scans from the end (gets the latest value). But it has a fatal flaw: **reads are O(n)**. With a million records, every lookup scans a million lines.
+
+## Enter the Index: B-Trees
+
+Real databases solve this with **indexes** — data structures that make lookups fast.
+
+<Definition term="B-Tree">
+A self-balancing tree data structure that maintains sorted data and allows searches, insertions, and deletions in O(log n) time. Almost every relational database (PostgreSQL, MySQL, SQLite) uses B-Trees as their primary index structure.
+</Definition>
+
+Think of a B-Tree like a phone book:
+- You don't scan every page to find "Smith"
+- You jump to the "S" section, then "Sm", then find "Smith"
+- Each level narrows your search by a large factor
+
+<Callout type="tip">
+A B-Tree with a branching factor of 500 can index **1 billion records** in just 4 levels. That means any record is at most 4 disk reads away — regardless of how much data you have.
+</Callout>
+
+## The Write-Ahead Log
+
+Here's a scary question: what happens if your database crashes mid-write?
+
+<Definition term="Write-Ahead Log (WAL)">
+A sequential log file where every change is recorded BEFORE it's applied to the actual data files. If the database crashes, it replays the WAL on startup to recover any changes that were in progress.
+</Definition>
+
+The WAL is the database's safety net. It's the reason your banking app doesn't lose your transfer if the server reboots.
+
+## SQL vs. NoSQL: Not a Religious War
+
+You've probably heard "SQL vs. NoSQL" presented as a choice. It's not — it's a spectrum of trade-offs:
+
+| Property | SQL (PostgreSQL) | NoSQL (MongoDB) | NoSQL (Cassandra) |
+|----------|-------------------|-----------------|-------------------|
+| Schema | Strict, enforced | Flexible, per-doc | Defined, per-table |
+| Joins | Built-in | Application-level | Not supported |
+| Scaling | Vertical first | Horizontal | Horizontal |
+| Consistency | Strong (ACID) | Tunable | Tunable |
+
+<Callout type="warning">
+"NoSQL" doesn't mean "better" or "more modern." It means "optimized for different access patterns." If your data has relationships (users → orders → products), a relational database is often the right choice. If your data is denormalized and read-heavy (product catalog, user profiles), a document store might fit better.
+</Callout>
+
+<Takeaways>
+- A database is fundamentally about storing data durably and retrieving it efficiently
+- B-Trees are the backbone of most database indexes — they enable O(log n) lookups even across billions of records
+- The Write-Ahead Log (WAL) ensures durability: changes are logged before they're applied, so crashes don't lose data
+- SQL vs. NoSQL is about trade-offs, not religion — choose based on your access patterns, consistency needs, and scale requirements
+</Takeaways>

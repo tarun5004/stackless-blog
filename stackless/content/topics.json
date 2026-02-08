@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "databases",
+    "name": "Databases",
+    "description": "How companies store, query, and scale their data — from B-Trees to distributed storage.",
+    "icon": "database"
+  },
+  {
+    "slug": "distributed-systems",
+    "name": "Distributed Systems",
+    "description": "The patterns behind systems that run across thousands of machines.",
+    "icon": "network"
+  },
+  {
+    "slug": "backend-architecture",
+    "name": "Backend Architecture",
+    "description": "How companies design their server-side systems for scale and reliability.",
+    "icon": "server"
+  }
+]

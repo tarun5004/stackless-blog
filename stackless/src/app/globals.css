@@ -1,0 +1,116 @@
+/*
+ * Stackless — Global Styles
+ *
+ * Design principles:
+ * 1. Light mode only (v1). Dark mode gated behind analytics data (v2).
+ * 2. Typography-first. The blog is text-heavy; readability is paramount.
+ * 3. Minimal custom CSS. Tailwind utilities + @tailwindcss/typography handle 95%.
+ * 4. System font stack for body, monospace for code — no custom font downloads.
+ */
+
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* -------------------------------------------------------------------------- */
+/* Design Tokens                                                               */
+/* -------------------------------------------------------------------------- */
+
+@theme inline {
+  /* Brand palette — warm, approachable, professional */
+  --color-brand-600: #2563eb;       /* Primary blue — links, accents */
+  --color-brand-700: #1d4ed8;       /* Hover state */
+  --color-brand-50: #eff6ff;        /* Light tint for callout backgrounds */
+
+  /* Neutral scale */
+  --color-surface: #ffffff;         /* Page background */
+  --color-surface-alt: #f8fafc;     /* Alternate sections (hero, footer) */
+  --color-border: #e2e8f0;         /* Subtle borders */
+  --color-text-primary: #0f172a;    /* Headings, body text — near-black */
+  --color-text-secondary: #475569;  /* Meta text, descriptions */
+  --color-text-muted: #94a3b8;     /* Timestamps, minor labels */
+
+  /* Typography */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Base resets & defaults                                                       */
+/* -------------------------------------------------------------------------- */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.7;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Prose overrides — fine-tune @tailwindcss/typography for Stackless            */
+/* -------------------------------------------------------------------------- */
+
+.prose {
+  --tw-prose-links: var(--color-brand-600);
+  max-width: 72ch; /* Optimal reading width */
+}
+
+.prose a {
+  text-decoration-color: var(--color-brand-600);
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.prose a:hover {
+  color: var(--color-brand-700);
+}
+
+/* Code blocks */
+.prose pre {
+  background-color: #1e293b;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+/* Inline code (not inside pre) */
+.prose :not(pre) > code {
+  background-color: var(--color-surface-alt);
+  padding: 0.15em 0.35em;
+  border-radius: 0.25rem;
+  font-weight: 500;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Utility classes                                                              */
+/* -------------------------------------------------------------------------- */
+
+/* Skip to content link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: var(--color-brand-600);
+  color: white;
+  border-radius: 0 0 0.5rem 0.5rem;
+  font-weight: 600;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}

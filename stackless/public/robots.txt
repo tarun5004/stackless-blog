@@ -1,0 +1,8 @@
+# https://www.robotstxt.org/robotstxt.html
+
+# Allow all crawlers, no restrictions
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://stackless.dev/sitemap.xml
