@@ -1,36 +1,30 @@
 /**
  * Admin Posts Page — lists all posts (published + drafts).
- *
- * Features:
- * - Status indicators (live, featured, draft)
- * - Filter by status
- * - Click to open post detail (edit metadata)
- * - Toggle draft/publish
  */
 
-import { getAllPosts } from "@/lib/content";
-import { getAllTopics } from "@/lib/topics";
+import { getPosts } from "@/db/queries/posts";
+import { getTopics } from "@/db/queries/topics";
 import AdminPostsList from "@/components/admin/AdminPostsList";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminPostsPage() {
-  const allPosts = getAllPosts(true);
-  const topics = getAllTopics();
+export default async function AdminPostsPage() {
+  const allPosts = await getPosts({ includeDrafts: true });
+  const topics = await getTopics();
 
   // Serialize for client component
   const postsData = allPosts.map((p) => ({
     slug: p.slug,
-    title: p.frontmatter.title,
-    topic: p.frontmatter.topic,
-    publishedAt: p.frontmatter.publishedAt,
-    draft: p.frontmatter.draft,
-    featured: p.frontmatter.featured,
-    readTimeMinutes: p.frontmatter.readTimeMinutes,
-    difficulty: p.frontmatter.difficulty,
-    sourceUrl: p.frontmatter.sourceUrl,
-    sourcePublisher: p.frontmatter.sourcePublisher,
-    readNext: p.frontmatter.readNext ?? [],
+    title: p.title,
+    topic: p.topic,
+    publishedAt: p.publishedAt,
+    draft: p.draft,
+    featured: p.featured,
+    readTimeMinutes: p.readTimeMinutes,
+    difficulty: p.difficulty,
+    sourceUrl: p.sourceUrl,
+    sourcePublisher: p.sourcePublisher,
+    readNext: p.readNext ?? [],
   }));
 
   const topicsData = topics.map((t) => ({
@@ -42,7 +36,7 @@ export default function AdminPostsPage() {
     <div>
       <h1 className="text-2xl font-bold text-text-primary">Posts</h1>
       <p className="mt-1 text-sm text-text-secondary">
-        Manage post metadata. To edit post content, use VS Code + Git.
+        Manage post metadata.
       </p>
       <AdminPostsList posts={postsData} topics={topicsData} />
     </div>

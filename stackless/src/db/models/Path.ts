@@ -1,15 +1,14 @@
-import mongoose, { Schema, type InferSchemaType } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const PathSchema = new Schema(
   {
-    name: { type: String, required: true },
+    title: { type: String, required: true },
     slug: { type: String, required: true, index: true },
-    postIds: [{ type: Schema.Types.ObjectId, ref: "Post" }],
+    description: { type: String, default: "" },
+    posts: { type: [String], default: [] },
   },
   { timestamps: true }
 );
-
-export type IPath = InferSchemaType<typeof PathSchema>;
 
 const Path = mongoose.models.Path || mongoose.model("Path", PathSchema);
 export default Path;

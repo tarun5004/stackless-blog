@@ -1,11 +1,11 @@
 /**
  * RSS feed generation — produces a full-content RSS 2.0 XML feed.
  *
- * Called at build time from /src/app/feed.xml/route.ts.
+ * Called from /src/app/feed.xml/route.ts.
  * The feed includes all published posts with their full summaries.
  */
 
-import type { PostEntry } from "./content";
+import type { DbPost } from "@/db/types";
 
 const SITE_URL = "https://stackless.dev";
 const SITE_TITLE = "Stackless";
@@ -15,18 +15,18 @@ const SITE_DESCRIPTION =
 /**
  * Generate RSS 2.0 XML string from an array of posts.
  */
-export function generateRssFeed(posts: PostEntry[]): string {
+export function generateRssFeed(posts: DbPost[]): string {
   const items = posts
     .map(
       (post) => `
     <item>
-      <title><![CDATA[${post.frontmatter.title}]]></title>
+      <title><![CDATA[${post.title}]]></title>
       <link>${SITE_URL}/posts/${post.slug}</link>
       <guid isPermaLink="true">${SITE_URL}/posts/${post.slug}</guid>
-      <description><![CDATA[${post.frontmatter.summary}]]></description>
-      <pubDate>${new Date(post.frontmatter.publishedAt).toUTCString()}</pubDate>
-      <category>${post.frontmatter.topic}</category>
-      <source url="${post.frontmatter.sourceUrl}">${post.frontmatter.sourcePublisher}</source>
+      <description><![CDATA[${post.summary}]]></description>
+      <pubDate>${new Date(post.publishedAt).toUTCString()}</pubDate>
+      <category>${post.topic}</category>
+      <source url="${post.sourceUrl}">${post.sourcePublisher}</source>
     </item>`
     )
     .join("");

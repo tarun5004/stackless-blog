@@ -7,6 +7,23 @@
  * 4. Logs results
  */
 
+// Load .env.local before anything else (Next.js does this automatically,
+// but plain tsx doesn't).
+import fs from "fs";
+import path from "path";
+const envPath = path.resolve(process.cwd(), ".env.local");
+if (fs.existsSync(envPath)) {
+  for (const line of fs.readFileSync(envPath, "utf-8").split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const idx = trimmed.indexOf("=");
+    if (idx === -1) continue;
+    const key = trimmed.slice(0, idx).trim();
+    const val = trimmed.slice(idx + 1).trim();
+    if (!process.env[key]) process.env[key] = val;
+  }
+}
+
 import { connectDB } from "./client";
 import { getPostBySlug, createPost } from "./queries/posts";
 import Post from "./models/Post";

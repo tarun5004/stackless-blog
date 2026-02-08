@@ -7,7 +7,9 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllPaths } from "@/lib/paths";
+import { getPaths } from "@/db/queries/paths";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Learning Paths",
@@ -15,8 +17,8 @@ export const metadata: Metadata = {
     "Follow guided learning paths on Stackless — curated sequences of posts that take you from fundamentals to real-world engineering.",
 };
 
-export default function PathsPage() {
-  const paths = getAllPaths();
+export default async function PathsPage() {
+  const paths = await getPaths();
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
@@ -31,20 +33,20 @@ export default function PathsPage() {
         </p>
       ) : (
         <div className="mt-10 space-y-6">
-          {paths.map((path) => (
+          {paths.map((p) => (
             <Link
-              key={path.slug}
-              href={`/paths/${path.slug}`}
+              key={p.slug}
+              href={`/paths/${p.slug}`}
               className="group block rounded-lg border border-border p-6 hover:border-brand-600 hover:bg-brand-50 transition-all"
             >
               <h2 className="text-xl font-semibold text-text-primary group-hover:text-brand-600 transition-colors">
-                {path.title}
+                {p.title}
               </h2>
               <p className="mt-2 text-sm text-text-secondary">
-                {path.description}
+                {p.description}
               </p>
               <p className="mt-3 text-xs text-text-muted">
-                {path.posts.length} post{path.posts.length !== 1 ? "s" : ""} in
+                {p.posts.length} post{p.posts.length !== 1 ? "s" : ""} in
                 this path
               </p>
             </Link>

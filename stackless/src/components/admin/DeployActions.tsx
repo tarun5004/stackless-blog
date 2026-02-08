@@ -10,7 +10,7 @@ export default function DeployActions() {
   async function triggerDeploy() {
     setStatus("deploying");
     try {
-      const res = await fetch("/api/admin/deploy", { method: "POST" });
+      const res = await fetch("/api/deploy", { method: "POST" });
       if (!res.ok) throw new Error("Deploy trigger failed");
       setStatus("success");
       setTimeout(() => setStatus("idle"), 5000);

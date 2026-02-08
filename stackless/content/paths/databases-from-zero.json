@@ -1,9 +1,0 @@
-{
-  "slug": "databases-from-zero",
-  "title": "Understanding Databases: From B-Trees to Distributed Storage",
-  "description": "Start with how databases work under the hood, then explore how companies like Discord scale them to handle trillions of records.",
-  "posts": [
-    "what-is-a-database-really",
-    "how-discord-stores-messages"
-  ]
-}

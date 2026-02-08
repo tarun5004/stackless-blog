@@ -1,28 +1,24 @@
 /**
  * Learning Path Detail Page — shows the ordered list of posts in a path.
- *
- * Pre-rendered at build time for each path JSON file.
  */
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getAllPathSlugs, getPathBySlug } from "@/lib/paths";
-import { getPostBySlug } from "@/lib/content";
+import { getPathBySlug } from "@/db/queries/paths";
+import { getPostBySlug } from "@/db/queries/posts";
+
+export const dynamic = "force-dynamic";
 
 interface PathPageProps {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  return getAllPathSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: PathPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const path = getPathBySlug(slug);
+  const path = await getPathBySlug(slug);
   if (!path) return {};
 
   return {
@@ -33,20 +29,22 @@ export async function generateMetadata({
 
 export default async function PathPage({ params }: PathPageProps) {
   const { slug } = await params;
-  const path = getPathBySlug(slug);
+  const path = await getPathBySlug(slug);
   if (!path) notFound();
 
   // Resolve post titles for each slug in the path
-  const postsWithTitles = path.posts.map((postSlug, index) => {
-    const post = getPostBySlug(postSlug);
-    return {
-      slug: postSlug,
-      title: post?.frontmatter.title ?? postSlug,
-      summary: post?.frontmatter.summary ?? "",
-      exists: !!post,
-      position: index + 1,
-    };
-  });
+  const postsWithTitles = await Promise.all(
+    path.posts.map(async (postSlug, index) => {
+      const post = await getPostBySlug(postSlug);
+      return {
+        slug: postSlug,
+        title: post?.title ?? postSlug,
+        summary: post?.summary ?? "",
+        exists: !!post,
+        position: index + 1,
+      };
+    })
+  );
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">

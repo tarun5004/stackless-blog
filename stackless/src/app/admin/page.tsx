@@ -5,26 +5,26 @@
  * and content health warnings.
  */
 
-import { getAllPosts } from "@/lib/content";
-import { getAllTopics } from "@/lib/topics";
-import { getAllPaths } from "@/lib/paths";
+import { getPosts } from "@/db/queries/posts";
+import { getTopics } from "@/db/queries/topics";
+import { getPaths } from "@/db/queries/paths";
 
-export const dynamic = "force-dynamic"; // Admin pages always render fresh
+export const dynamic = "force-dynamic";
 
-export default function AdminOverviewPage() {
-  const allPosts = getAllPosts(true); // includeDrafts=true for admin
-  const topics = getAllTopics();
-  const paths = getAllPaths();
+export default async function AdminOverviewPage() {
+  const allPosts = await getPosts({ includeDrafts: true });
+  const topics = await getTopics();
+  const paths = await getPaths();
 
-  const published = allPosts.filter((p) => !p.frontmatter.draft);
-  const drafts = allPosts.filter((p) => p.frontmatter.draft);
-  const featured = allPosts.filter((p) => p.frontmatter.featured);
+  const published = allPosts.filter((p) => !p.draft);
+  const drafts = allPosts.filter((p) => p.draft);
+  const featured = allPosts.filter((p) => p.featured);
 
   // Content health checks
   const warnings: string[] = [];
 
   const postsWithoutReadNext = published.filter(
-    (p) => !p.frontmatter.readNext || p.frontmatter.readNext.length === 0
+    (p) => !p.readNext || p.readNext.length === 0
   );
   if (postsWithoutReadNext.length > 0) {
     warnings.push(
@@ -34,10 +34,10 @@ export default function AdminOverviewPage() {
 
   const allSlugs = new Set(published.map((p) => p.slug));
   for (const post of published) {
-    for (const rnSlug of post.frontmatter.readNext ?? []) {
+    for (const rnSlug of post.readNext ?? []) {
       if (!allSlugs.has(rnSlug)) {
         warnings.push(
-          `"${post.frontmatter.title}" has readNext slug "${rnSlug}" that doesn't match any published post`
+          `"${post.title}" has readNext slug "${rnSlug}" that doesn't match any published post`
         );
       }
     }
@@ -45,9 +45,9 @@ export default function AdminOverviewPage() {
 
   const topicSlugs = new Set(topics.map((t) => t.slug));
   for (const post of published) {
-    if (!topicSlugs.has(post.frontmatter.topic)) {
+    if (!topicSlugs.has(post.topic)) {
       warnings.push(
-        `"${post.frontmatter.title}" has topic "${post.frontmatter.topic}" which doesn't exist`
+        `"${post.title}" has topic "${post.topic}" which doesn't exist`
       );
     }
   }
@@ -100,9 +100,7 @@ export default function AdminOverviewPage() {
           <div className="flex gap-2">
             <dt className="text-text-secondary">Featured post:</dt>
             <dd className="font-medium text-text-primary">
-              {featured.length > 0
-                ? featured[0].frontmatter.title
-                : "None set"}
+              {featured.length > 0 ? featured[0].title : "None set"}
             </dd>
           </div>
           <div className="flex gap-2">

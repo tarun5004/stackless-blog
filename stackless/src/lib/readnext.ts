@@ -11,15 +11,7 @@
  * Returns exactly 2 suggestions (or fewer if there aren't enough posts).
  */
 
-import type { PostEntry } from "./content";
-import type { PathNavData } from "./paths";
-
-export interface ReadNextSuggestion {
-  slug: string;
-  title: string;
-  summary: string;
-  topic: string;
-}
+import type { DbPost, PathNavData, ReadNextSuggestion } from "@/db/types";
 
 /**
  * Resolve Read Next suggestions for a given post.
@@ -31,14 +23,14 @@ export interface ReadNextSuggestion {
  */
 export function getReadNextSuggestions(
   currentSlug: string,
-  allPosts: PostEntry[],
+  allPosts: DbPost[],
   pathNav: PathNavData | null,
   maxResults = 2
 ): ReadNextSuggestion[] {
   const currentPost = allPosts.find((p) => p.slug === currentSlug);
   if (!currentPost) return [];
 
-  const currentTopic = currentPost.frontmatter.topic;
+  const currentTopic = currentPost.topic;
 
   // Slugs to exclude: current post + the path's next post (if any)
   const excludeSlugs = new Set([currentSlug]);
@@ -48,12 +40,12 @@ export function getReadNextSuggestions(
 
   // Step 1: Same-topic posts
   const sameTopic = allPosts.filter(
-    (p) => p.frontmatter.topic === currentTopic && !excludeSlugs.has(p.slug)
+    (p) => p.topic === currentTopic && !excludeSlugs.has(p.slug)
   );
 
   // Step 2: Other-topic posts (fallback filler)
   const otherTopic = allPosts.filter(
-    (p) => p.frontmatter.topic !== currentTopic && !excludeSlugs.has(p.slug)
+    (p) => p.topic !== currentTopic && !excludeSlugs.has(p.slug)
   );
 
   // Combine: same topic first, then others
@@ -61,8 +53,8 @@ export function getReadNextSuggestions(
 
   return candidates.slice(0, maxResults).map((p) => ({
     slug: p.slug,
-    title: p.frontmatter.title,
-    summary: p.frontmatter.summary,
-    topic: p.frontmatter.topic,
+    title: p.title,
+    summary: p.summary,
+    topic: p.topic,
   }));
 }

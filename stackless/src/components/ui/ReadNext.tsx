@@ -6,7 +6,7 @@
  */
 
 import Link from "next/link";
-import type { ReadNextSuggestion } from "@/lib/readnext";
+import type { ReadNextSuggestion } from "@/db/types";
 
 interface ReadNextProps {
   suggestions: ReadNextSuggestion[];

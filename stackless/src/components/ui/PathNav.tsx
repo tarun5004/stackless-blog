@@ -6,7 +6,7 @@
  */
 
 import Link from "next/link";
-import type { PathNavData } from "@/lib/paths";
+import type { PathNavData } from "@/db/types";
 
 interface PathNavProps {
   pathNav: PathNavData;

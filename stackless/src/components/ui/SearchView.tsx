@@ -17,7 +17,6 @@ interface PostData {
 interface Topic {
   slug: string;
   name: string;
-  description: string;
 }
 
 interface SearchViewProps {

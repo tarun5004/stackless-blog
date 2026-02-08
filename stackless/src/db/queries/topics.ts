@@ -4,13 +4,35 @@
 
 import { connectDB } from "../client";
 import Topic from "../models/Topic";
+import type { DbTopic } from "../types";
+import { serializeDoc, serializeDocs } from "@/lib/serialize";
 
-export async function getTopics() {
+/**
+ * Get all topics, sorted alphabetically by name.
+ */
+export async function getTopics(): Promise<DbTopic[]> {
   await connectDB();
-  return Topic.find().sort({ name: 1 }).lean();
+  const docs = await Topic.find().sort({ name: 1 }).lean<DbTopic[]>();
+  return serializeDocs(docs);
 }
 
-export async function createTopic(data: { name: string; slug: string }) {
+/**
+ * Get a single topic by slug.
+ */
+export async function getTopicBySlug(slug: string): Promise<DbTopic | null> {
+  await connectDB();
+  const doc = await Topic.findOne({ slug }).lean<DbTopic>();
+  return doc ? serializeDoc(doc) : null;
+}
+
+/**
+ * Create a new topic.
+ */
+export async function createTopic(data: {
+  name: string;
+  slug: string;
+  description?: string;
+}) {
   await connectDB();
   return Topic.create(data);
 }

@@ -9,15 +9,17 @@
  */
 
 import Link from "next/link";
-import { getAllPosts } from "@/lib/content";
-import { getAllTopics } from "@/lib/topics";
-import PostCard from "@/components/shared/PostCard";
+import { getPosts } from "@/db/queries/posts";
+import { getTopics } from "@/db/queries/topics";
+import PostCard from "@/components/ui/PostCard";
 
-export default function HomePage() {
-  const posts = getAllPosts();
-  const topics = getAllTopics();
-  const featuredPost = posts.find((p) => p.frontmatter.featured);
-  const latestPosts = posts.filter((p) => !p.frontmatter.featured);
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const posts = await getPosts();
+  const topics = await getTopics();
+  const featuredPost = posts.find((p) => p.featured);
+  const latestPosts = posts.filter((p) => !p.featured);
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6">
@@ -65,18 +67,18 @@ export default function HomePage() {
             className="group mt-3 block"
           >
             <h2 className="text-2xl font-bold text-text-primary group-hover:text-brand-600 transition-colors sm:text-3xl">
-              {featuredPost.frontmatter.title}
+              {featuredPost.title}
             </h2>
             <p className="mt-3 text-text-secondary leading-relaxed">
-              {featuredPost.frontmatter.summary}
+              {featuredPost.summary}
             </p>
             <div className="mt-3 flex items-center gap-3 text-sm text-text-muted">
-              <span className="capitalize">{featuredPost.frontmatter.topic}</span>
+              <span className="capitalize">{featuredPost.topic}</span>
               <span aria-hidden="true">·</span>
-              <span>{featuredPost.frontmatter.readTimeMinutes} min read</span>
+              <span>{featuredPost.readTimeMinutes} min read</span>
               <span aria-hidden="true">·</span>
-              <time dateTime={featuredPost.frontmatter.publishedAt}>
-                {new Date(featuredPost.frontmatter.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              <time dateTime={featuredPost.publishedAt}>
+                {new Date(featuredPost.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
               </time>
             </div>
           </Link>

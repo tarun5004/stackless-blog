@@ -1,29 +1,24 @@
 /**
  * Topic Detail Page — shows all posts in a given topic.
- *
- * Uses generateStaticParams() to pre-render a page for each topic
- * defined in topics.json.
  */
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAllTopicSlugs, getTopicBySlug } from "@/lib/topics";
-import { getPostsByTopic } from "@/lib/content";
-import PostCard from "@/components/shared/PostCard";
+import { getTopicBySlug } from "@/db/queries/topics";
+import { getPostsByTopic } from "@/db/queries/posts";
+import PostCard from "@/components/ui/PostCard";
+
+export const dynamic = "force-dynamic";
 
 interface TopicPageProps {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  return getAllTopicSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: TopicPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const topic = getTopicBySlug(slug);
+  const topic = await getTopicBySlug(slug);
   if (!topic) return {};
 
   return {
@@ -34,10 +29,10 @@ export async function generateMetadata({
 
 export default async function TopicPage({ params }: TopicPageProps) {
   const { slug } = await params;
-  const topic = getTopicBySlug(slug);
+  const topic = await getTopicBySlug(slug);
   if (!topic) notFound();
 
-  const posts = getPostsByTopic(slug);
+  const posts = await getPostsByTopic(slug);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">

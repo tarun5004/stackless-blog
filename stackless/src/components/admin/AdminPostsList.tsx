@@ -224,21 +224,7 @@ export default function AdminPostsList({
               >
                 View Live Post ↗
               </Link>
-              <a
-                href={`https://github.com/stackless-dev/stackless/blob/main/content/posts/${selectedPost.slug}.mdx`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex w-full items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-alt transition-colors"
-              >
-                Open in GitHub ↗
-              </a>
             </div>
-
-            <p className="mt-4 text-xs text-text-muted text-center">
-              To edit content or metadata, use VS Code + Git.
-              <br />
-              API-based metadata editing coming in v2.
-            </p>
           </div>
         )}
       </div>

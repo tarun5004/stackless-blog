@@ -6,7 +6,9 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllTopics } from "@/lib/topics";
+import { getTopics } from "@/db/queries/topics";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Topics",
@@ -14,8 +16,8 @@ export const metadata: Metadata = {
     "Browse Stackless posts by topic — databases, distributed systems, backend architecture, and more.",
 };
 
-export default function TopicsPage() {
-  const topics = getAllTopics();
+export default async function TopicsPage() {
+  const topics = await getTopics();
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">

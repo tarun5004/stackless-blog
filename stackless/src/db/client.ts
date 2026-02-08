@@ -7,12 +7,6 @@
 
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI is not defined in environment variables");
-}
-
 /**
  * Global cache — survives Next.js hot reloads in dev.
  * In production there is no hot reload, so this just ensures
@@ -44,9 +38,14 @@ if (!global._mongooseCache) {
 export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) return cached.conn;
 
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error("MONGODB_URI is not defined in environment variables");
+  }
+
   if (!cached.promise) {
     cached.promise = mongoose
-      .connect(MONGODB_URI as string, { dbName: "stackless" })
+      .connect(uri, { dbName: "stackless" })
       .then((m) => {
         console.log("[db] Connected to MongoDB (stackless)");
         return m;

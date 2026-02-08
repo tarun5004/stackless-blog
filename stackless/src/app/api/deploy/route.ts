@@ -1,8 +1,8 @@
 /**
- * POST /api/admin/deploy — trigger a Vercel rebuild.
+ * POST /api/deploy — trigger a Vercel rebuild.
  *
  * Calls the Vercel deploy hook URL stored in VERCEL_DEPLOY_HOOK_URL.
- * Protected by NextAuth middleware (only authenticated admin can call).
+ * Protected by NextAuth (only authenticated admin can call).
  */
 
 import { auth } from "@/lib/auth";

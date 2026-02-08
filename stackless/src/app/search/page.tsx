@@ -1,34 +1,34 @@
 /**
  * Search Page — client-side post search.
  *
- * Lightweight v1 implementation: loads all post metadata at build time,
- * filters client-side by title, summary, topic, and publisher.
- * Will be replaced by Pagefind in v2 when content exceeds ~30 posts.
+ * Loads all post metadata from DB, filters client-side.
  */
 
-import { getAllPosts } from "@/lib/content";
-import { getAllTopics } from "@/lib/topics";
-import SearchView from "@/components/search/SearchView";
+import { getPosts } from "@/db/queries/posts";
+import { getTopics } from "@/db/queries/topics";
+import SearchView from "@/components/ui/SearchView";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Search — Stackless",
   description: "Search all Stackless engineering blog posts.",
 };
 
-export default function SearchPage() {
-  const posts = getAllPosts();
-  const topics = getAllTopics();
+export default async function SearchPage() {
+  const posts = await getPosts();
+  const topics = await getTopics();
 
-  // Pass only the data the client needs (no raw MDX content)
+  // Pass only the data the client needs (no raw content)
   const postData = posts.map((p) => ({
     slug: p.slug,
-    title: p.frontmatter.title,
-    summary: p.frontmatter.summary,
-    topic: p.frontmatter.topic,
-    publishedAt: p.frontmatter.publishedAt,
-    sourcePublisher: p.frontmatter.sourcePublisher,
-    difficulty: p.frontmatter.difficulty,
-    readTimeMinutes: p.frontmatter.readTimeMinutes,
+    title: p.title,
+    summary: p.summary,
+    topic: p.topic,
+    publishedAt: p.publishedAt,
+    sourcePublisher: p.sourcePublisher,
+    difficulty: p.difficulty,
+    readTimeMinutes: p.readTimeMinutes,
   }));
 
   return (
@@ -37,7 +37,7 @@ export default function SearchPage() {
       <p className="mt-1 text-sm text-text-secondary">
         Find posts by title, topic, publisher, or keyword.
       </p>
-      <SearchView posts={postData} topics={topics} />
+      <SearchView posts={postData} topics={topics.map((t) => ({ slug: t.slug, name: t.name }))} />
     </div>
   );
 }
