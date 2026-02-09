@@ -79,10 +79,11 @@ export default function PostEditor({
     setErrorMsg("");
 
     try {
+      const payload = { ...form, published: !form.draft };
       const res = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {

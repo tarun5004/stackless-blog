@@ -99,3 +99,11 @@ export async function updatePost(
   const doc = await Post.findOneAndUpdate({ slug }, data, { new: true }).lean<DbPost>();
   return doc ? serializeDoc(doc) : null;
 }
+
+/**
+ * Delete a post by slug.
+ */
+export async function deletePost(slug: string): Promise<void> {
+  await connectDB();
+  await Post.deleteOne({ slug });
+}

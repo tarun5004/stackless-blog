@@ -35,7 +35,7 @@ export default function AdminSettingsPage() {
         {/* Data */}
         <SettingsSection title="Data">
           <SettingsField label="Database" value="MongoDB Atlas" />
-          <SettingsField label="Auth Provider" value="GitHub OAuth" />
+          <SettingsField label="Auth Provider" value="Credentials (Email + Password)" />
         </SettingsSection>
       </div>
     </div>

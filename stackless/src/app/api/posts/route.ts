@@ -5,7 +5,7 @@
 
 import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
-import { getPosts, createPost, updatePost } from "@/db/queries/posts";
+import { getPosts, createPost, updatePost, deletePost } from "@/db/queries/posts";
 
 export async function GET(req: NextRequest) {
   const includeDrafts = req.nextUrl.searchParams.get("drafts") === "true";
@@ -57,6 +57,29 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json(post);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to update post";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { slug } = await req.json();
+    if (!slug) {
+      return NextResponse.json(
+        { error: "slug is required" },
+        { status: 400 }
+      );
+    }
+
+    await deletePost(slug);
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to delete post";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

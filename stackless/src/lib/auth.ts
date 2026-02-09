@@ -1,51 +1,62 @@
 /**
- * NextAuth v5 configuration — GitHub OAuth for admin access.
+ * NextAuth v5 configuration — Credentials-based admin access.
  *
- * Only the GitHub account whose numeric ID matches ADMIN_GITHUB_ID
- * is allowed to sign in. All other GitHub users are rejected.
+ * Uses ADMIN_EMAIL and ADMIN_PASSWORD env vars for authentication.
+ * Only the single admin account can sign in.
  *
  * Sessions use HTTP-only cookies (JWT strategy) — no database needed.
  */
 
 import NextAuth from "next-auth";
-import GitHub from "next-auth/providers/github";
+import Credentials from "next-auth/providers/credentials";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
-    GitHub({
-      clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
+    Credentials({
+      name: "Admin Login",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        const adminEmail = process.env.ADMIN_EMAIL;
+        const adminPassword = process.env.ADMIN_PASSWORD;
+
+        if (!adminEmail || !adminPassword) {
+          console.error("ADMIN_EMAIL or ADMIN_PASSWORD not set");
+          return null;
+        }
+
+        if (
+          credentials?.email === adminEmail &&
+          credentials?.password === adminPassword
+        ) {
+          return {
+            id: "admin",
+            name: "Admin",
+            email: adminEmail,
+          };
+        }
+
+        return null;
+      },
     }),
   ],
 
   callbacks: {
-    /**
-     * Only allow the designated admin GitHub account to sign in.
-     * The ADMIN_GITHUB_ID env var holds the numeric GitHub user ID.
-     */
-    async signIn({ profile }) {
-      const adminId = process.env.ADMIN_GITHUB_ID;
-      if (!adminId) {
-        console.error("ADMIN_GITHUB_ID not set — blocking all sign-ins");
-        return false;
-      }
-      return String(profile?.id) === adminId;
-    },
-
-    /** Attach GitHub profile info to the JWT */
-    async jwt({ token, profile }) {
-      if (profile) {
-        token.githubId = String(profile.id);
-        token.githubLogin = profile.login as string;
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
       }
       return token;
     },
 
-    /** Expose GitHub info in the session object */
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.githubId as string;
-        session.user.name = token.githubLogin as string;
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = "Admin";
       }
       return session;
     },
@@ -58,6 +69,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   session: {
     strategy: "jwt",
-    maxAge: 7 * 24 * 60 * 60, // 7 days as per spec
+    maxAge: 7 * 24 * 60 * 60, // 7 days
   },
 });
